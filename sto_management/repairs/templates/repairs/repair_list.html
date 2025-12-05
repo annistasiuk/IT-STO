@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div style="max-width: 1200px; margin: 0 auto;">
+
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+        <h2 style="margin: 0; color: #ffffff; text-transform: uppercase; font-weight: 800; border-left: 5px solid #D60000; padding-left: 15px; letter-spacing: 1px; line-height: 1;">
+            Журнал ремонтів
+        </h2>
+        <a href="{% url 'home' %}" style="color: #666; text-decoration: none; font-size: 14px; display: flex; align-items: center; gap: 5px; transition: color 0.3s;">
+            <span>←</span> На головну
+        </a>
+    </div>
+
+    <div class="stat-card" style="padding: 20px; margin-bottom: 30px; background-color: #1a1a1a; border: 1px solid #333; display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+        <div style="color: #D60000; font-weight: 700; text-transform: uppercase; font-size: 12px; letter-spacing: 1px;">
+            Фільтрувати за статусом:
+        </div>
+
+        <form method="get" style="margin: 0; padding: 0; border: none; background: transparent; display: flex; gap: 10px; flex: 1; align-items: center;">
+            <select name="status" id="status-filter" style="margin: 0; width: auto; min-width: 200px; padding: 10px 15px; background: #0f0f0f; border: 1px solid #333; color: white;">
+                <option value="">Всі ремонти</option>
+                {% for value, display_name in status_choices %}
+                    <option value="{{ value }}" {% if current_filter == value %}selected{% endif %}>
+                        {{ display_name }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <button type="submit" class="btn btn-primary" style="padding: 10px 25px; font-size: 12px; margin: 0;">
+                ЗАСТОСУВАТИ
+            </button>
+
+            {% if current_filter %}
+                <a href="{% url 'repair_list' %}" style="color: #666; font-size: 12px; text-decoration: underline; margin-left: 10px;">Скинути</a>
+            {% endif %}
+        </form>
+    </div>
+
+    <div class="table-container" style="background: #1a1a1a; border: 1px solid #333; border-radius: 8px;">
+        <table style="width: 100%; border-collapse: separate; border-spacing: 0;">
+            <thead>
+                <tr style="background: #1f1f1f;">
+                    <th style="padding: 15px 20px; text-align: left; color: #666; font-size: 12px; font-weight: 700; border-bottom: 1px solid #333;">АВТО</th>
+                    <th style="padding: 15px 20px; text-align: left; color: #666; font-size: 12px; font-weight: 700; border-bottom: 1px solid #333;">ОПИС РОБІТ</th>
+                    <th style="padding: 15px 20px; text-align: left; color: #666; font-size: 12px; font-weight: 700; border-bottom: 1px solid #333;">СТАТУС</th>
+                    <th style="padding: 15px 20px; text-align: left; color: #666; font-size: 12px; font-weight: 700; border-bottom: 1px solid #333;">ДАТА ПОЧАТКУ</th>
+                    <th style="padding: 15px 20px; text-align: right; color: #666; font-size: 12px; font-weight: 700; border-bottom: 1px solid #333;">ДІЇ</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for repair in repairs %}
+                <tr style="transition: background 0.2s;">
+                    <td style="padding: 15px 20px; border-bottom: 1px solid #222; font-weight: 700; color: #fff;">
+                        {{ repair.car.make }} {{ repair.car.model }}
+                        <div style="font-size: 11px; color: #666; font-weight: 400; margin-top: 4px;">{{ repair.car.vin }}</div>
+                    </td>
+
+                    <td style="padding: 15px 20px; border-bottom: 1px solid #222; color: #ccc; max-width: 300px;">
+                        {{ repair.description|truncatechars:50 }}
+                    </td>
+
+                    <td style="padding: 15px 20px; border-bottom: 1px solid #222;">
+                        {% if repair.status == 'new' %}
+                            <span class="status-badge pending" style="font-size: 11px;">Новий</span>
+                        {% elif repair.status == 'in_progress' %}
+                            <span class="status-badge in-progress" style="font-size: 11px;">В роботі</span>
+                        {% elif repair.status == 'completed' %}
+                            <span class="status-badge completed" style="font-size: 11px;">Готово</span>
+                        {% else %}
+                            <span class="status-badge" style="background: #333; color: #ccc; border: 1px solid #555; font-size: 11px;">{{ repair.get_status_display }}</span>
+                        {% endif %}
+                    </td>
+
+                    <td style="padding: 15px 20px; border-bottom: 1px solid #222; color: #888;">
+                        {{ repair.start_date|date:"d.m.Y H:i" }}
+                    </td>
+
+                    <td style="padding: 15px 20px; border-bottom: 1px solid #222; text-align: right;">
+                        <div style="display: flex; gap: 8px; justify-content: flex-end;">
+                            <a href="{% url 'edit_repair' repair.id %}" class="btn" style="padding: 6px 12px; font-size: 11px; background: transparent; border: 1px solid #D60000; color: #D60000;" title="Редагувати">
+                                ✎
+                            </a>
+
+                            <!-- Кнопка PDF -->
+                            <a href="{% url 'generate_invoice' repair.id %}" class="btn" style="padding: 6px 12px; font-size: 11px; background: transparent; border: 1px solid #444; color: #ccc;" title="Завантажити PDF">
+                                PDF
+                            </a>
+                            <a href="{% url 'send_invoice' repair.id %}" class="btn" style="padding: 6px 12px; font-size: 11px; background: transparent; border: 1px solid #444; color: #ccc;" title="Надіслати Email">
+                                ✉️
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" style="text-align: center; padding: 60px; color: #666;">
+                        <div style="font-size: 40px; margin-bottom: 10px; opacity: 0.3;">📂</div>
+                        Ремонтів за вибраними критеріями не знайдено.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

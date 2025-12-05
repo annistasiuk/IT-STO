@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div style="max-width: 800px; margin: 0 auto;">
+
+    <!-- Заголовок сторінки -->
+    <div style="margin-bottom: 30px;">
+        <h2 style="margin: 0; color: #ffffff; text-transform: uppercase; font-weight: 800; border-left: 5px solid #D60000; padding-left: 15px; letter-spacing: 1px; line-height: 1;">
+            Додати новий автомобіль
+        </h2>
+    </div>
+
+    <!-- Основний контейнер форми (Стиль картки) -->
+    <div class="stat-card" style="padding: 40px; background-color: #1a1a1a; border: 1px solid #333; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+
+        <!-- Додано enctype="multipart/form-data" для підтримки завантаження фото -->
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <!-- Блок помилок (якщо є) -->
+            {% if form.errors %}
+                <div style="background: rgba(214, 0, 0, 0.1); border-left: 4px solid #D60000; color: #ff8888; padding: 15px; margin-bottom: 30px; border-radius: 4px;">
+                    <p style="margin: 0; font-weight: 600; display: flex; align-items: center; gap: 10px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                        Будь ласка, перевірте введені дані
+                    </p>
+                </div>
+            {% endif %}
+
+            <!-- Поля форми (Grid Layout) -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px;">
+                {% for field in form %}
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <!-- Лейбл (Назва поля) -->
+                        <label for="{{ field.id_for_label }}" style="color: #D60000; margin-bottom: 10px; display: block; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; font-weight: 700;">
+                            {{ field.label }}
+                        </label>
+
+                        <!-- Поле вводу -->
+                        <div style="position: relative;">
+                            {{ field }}
+                        </div>
+
+                        <!-- Помилка конкретного поля -->
+                        {% if field.errors %}
+                            <div style="color: #ff4444; font-size: 12px; margin-top: 6px; display: flex; align-items: center; gap: 5px;">
+                                <span>•</span>
+                                {% for error in field.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
+                        <!-- Підказка (Help text), якщо є -->
+                        {% if field.help_text %}
+                            <div style="color: #666; font-size: 11px; margin-top: 4px;">{{ field.help_text }}</div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- Кнопки дій -->
+            <div style="margin-top: 40px; padding-top: 30px; border-top: 1px solid #333; display: flex; justify-content: flex-end; gap: 15px;">
+                <!-- Кнопка СКАСУВАТИ: прибрав клас btn, щоб видалити червоні стилі, і прописав нейтральні стилі вручну -->
+                <a href="{% url 'home' %}" style="display: inline-flex; align-items: center; justify-content: center; padding: 12px 30px; background: transparent; border: 1px solid #444; border-radius: 4px; color: #888; text-decoration: none; font-weight: 600; font-size: 14px; transition: all 0.3s; text-transform: uppercase;">
+                    СКАСУВАТИ
+                </a>
+
+                <button type="submit" class="btn btn-primary" style="padding: 12px 40px; font-size: 14px; box-shadow: 0 4px 15px rgba(214, 0, 0, 0.4);">
+                    ЗБЕРЕГТИ АВТОМОБІЛЬ
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

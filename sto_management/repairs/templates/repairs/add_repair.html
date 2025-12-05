@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div style="max-width: 800px; margin: 0 auto;">
+
+    <div style="margin-bottom: 30px;">
+        <h2 style="margin: 0; color: #ffffff; text-transform: uppercase; font-weight: 800; border-left: 5px solid #D60000; padding-left: 15px; letter-spacing: 1px; line-height: 1;">
+            Нова заявка на ремонт
+        </h2>
+    </div>
+
+    <div class="stat-card" style="padding: 40px; background-color: #1a1a1a; border: 1px solid #333; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div style="display: grid; gap: 25px;">
+                {% for field in form %}
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label for="{{ field.id_for_label }}" style="color: #D60000; margin-bottom: 10px; display: block; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; font-weight: 700;">
+                            {{ field.label }}
+                        </label>
+                        {{ field }}
+                        {% if field.errors %}
+                            <div style="color: #ff4444; font-size: 12px; margin-top: 6px;">{{ field.errors }}</div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div style="margin-top: 40px; padding-top: 30px; border-top: 1px solid #333; display: flex; justify-content: flex-end; gap: 15px;">
+                <a href="{% url 'repair_list' %}" style="display: inline-flex; align-items: center; justify-content: center; padding: 12px 30px; background: transparent; border: 1px solid #444; border-radius: 4px; color: #888; text-decoration: none; font-weight: 600; font-size: 14px; transition: all 0.3s; text-transform: uppercase;">
+                    СКАСУВАТИ
+                </a>
+                <button type="submit" class="btn btn-primary" style="padding: 12px 40px; font-size: 14px; box-shadow: 0 4px 15px rgba(214, 0, 0, 0.4);">
+                    СТВОРИТИ ЗАЯВКУ
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
